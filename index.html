@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>TVT Team – FlowLabs Image Creator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#22c55e',
+              dark: '#16a34a'
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+  <div class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="border-b border-slate-200 bg-white/80 dark:bg-slate-900/80 dark:border-slate-800 backdrop-blur">
+      <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+        <!-- Logo TVT Team -->
+        <div class="flex items-center gap-2">
+          <!-- Thay bằng logo SVG / PNG thật của bạn -->
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 flex items-center justify-center shadow-md">
+            <span class="text-xs font-bold text-white tracking-tight">TVT</span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold leading-tight">TẠO HÌNH ẢNH AI CHUYÊN NGHIỆP</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              TVT Team
+            </p>
+          </div>
+        </div>
+
+        <!-- Toggle Dark / Light -->
+        <button
+          id="themeToggle"
+          type="button"
+          class="flex items-center gap-2 text-[11px] px-2.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm
+                 hover:bg-slate-100 active:scale-[0.98]
+                 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+        >
+          <span class="theme-label">Light</span>
+          <span
+            class="relative inline-flex h-4 w-7 items-center rounded-full bg-slate-300 dark:bg-slate-600 transition-colors"
+          >
+            <span
+              class="dot inline-block h-3 w-3 rounded-full bg-white shadow transform translate-x-[3px] dark:translate-x-[16px] transition-transform"
+            ></span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 flex justify-center">
+      <div class="w-full max-w-md px-4 py-4">
+        <!-- Form -->
+        <form
+          id="generatorForm"
+          class="space-y-4 rounded-2xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-200/60 backdrop-blur
+                 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-black/40 px-4 py-4"
+        >
+          <!-- Prompt -->
+          <div>
+            <label for="prompt" class="block text-sm font-medium mb-1">
+              Mô tả yêu cầu <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="prompt"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70 dark:focus:ring-primary
+                     resize-none min-h-[90px]"
+              placeholder="Mô tả cảnh / nhân vật / bố cục bạn muốn tạo (càng chi tiết càng ra hình đẹp)"
+              required
+            ></textarea>
+            <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+              Gợi ý: hãy mô tả bằng các từ khóa rõ ràng, có thể dùng tiếng Anh để model hiểu tốt hơn.
+            </p>
+          </div>
+
+          <!-- Style -->
+          <div>
+            <label for="style" class="block text-sm font-medium mb-1">
+              Phong cách
+            </label>
+            <select
+              id="style"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70"
+            >
+              <option value="">-- Không bắt buộc --</option>
+              <option value="modern, clean, minimal style">Phong cách hiện đại, tối giản</option>
+              <option value="ancient, historical, old painting style">Phong cách cổ xưa, cổ đại, lịch sử</option>
+              <option value="fantasy, magical, epic style">Phong cách tưởng tượng / Huyền ảo</option>
+              <option value="ultra realistic, photographic style">Phong cách siêu thực</option>
+              <option value="2D cartoon, chibi, bright colors">Phong cách hoạt hình 2D chibi, màu sắc tươi sáng</option>
+              <option value="anime, cinematic, detailed shading">Phong cách hoạt hình Anime</option>
+            </select>
+          </div>
+
+          <!-- Main color -->
+          <div>
+            <label for="mainColor" class="block text-sm font-medium mb-1">
+              Màu chủ đạo
+            </label>
+            <select
+              id="mainColor"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70"
+            >
+              <option value="">-- Không bắt buộc --</option>
+              <option value="neon green as main color">Xanh nõn chuối</option>
+              <option value="red as main color">Đỏ</option>
+              <option value="deep blue as main color">Xanh dương đậm</option>
+              <option value="pastel colors palette">Pastel nhẹ nhàng</option>
+              <option value="black and gold as main colors">Đen - Vàng</option>
+              <option value="monochrome, black and white">Đen trắng</option>
+            </select>
+          </div>
+
+          <!-- Lighting -->
+          <div>
+            <label for="lighting" class="block text-sm font-medium mb-1">
+              Ánh sáng
+            </label>
+            <select
+              id="lighting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70"
+            >
+              <option value="">-- Auto / để model tự hiểu --</option>
+              <option value="soft cinematic lighting, gentle shadows">Ánh sáng điện ảnh dịu nhẹ, bóng đổ tinh tế.</option>
+              <option value="hard dramatic lighting, strong contrast shadows">Ánh sáng ấn tượng, độ tương phản cao.</option>
+              <option value="golden hour sunlight, warm and soft">Ánh nắng hoàng hôn, ấm áp và dịu nhẹ.</option>
+              <option value="studio softbox lighting, very clean and bright">Softbox studio, sạch sẽ và sáng sủa.</option>
+              <option value="neon cyberpunk lighting, purple and blue glow">Phong cách đèn neon, ánh sáng tím và xanh lam.</option>
+              <option value="moody low key lighting, dark and mysterious">Ánh sáng mờ ảo, u ám và bí ẩn.</option>
+            </select>
+          </div>
+
+          <!-- Background -->
+          <div>
+            <label for="background" class="block text-sm font-medium mb-1">
+              Bối cảnh / Nền
+            </label>
+            <select
+              id="background"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70"
+            >
+              <option value="">-- Không bắt buộc --</option>
+              <option value="simple plain background, soft gradient">Nền đơn giản / màu trơn</option>
+              <option value="indoor studio background, clean wall">Trong nhà / studio</option>
+              <option value="outdoor nature background, trees and sky">Ngoài trời – thiên nhiên</option>
+              <option value="outdoor city street background, buildings and lights">Ngoài trời – thành phố</option>
+              <option value="fantasy landscape background, magical environment">Phong cảnh huyền ảo / fantasy</option>
+              <option value="sci-fi futuristic city background, neon lights">Không gian viễn tưởng / sci-fi</option>
+            </select>
+          </div>
+
+          <!-- Size -->
+          <div>
+            <label for="size" class="block text-sm font-medium mb-1">
+              Kích thước mong muốn
+            </label>
+            <select
+              id="size"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+                     dark:border-slate-700 dark:bg-slate-900/70"
+            >
+              <option value="">-- Không bắt buộc --</option>
+              <option value="name card size, 3.5x2 inches, vertical">Name card (3.5x2 inches, ngang)</option>
+              <option value="A4 size, 210x297mm, vertical">A4 dọc (A4 size, dọc)</option>
+              <option value="A4 size, 210x297mm, horizontal">A4 ngang (A4 size, ngang)</option>
+            </select>
+          </div>
+
+          <!-- Aspect Ratio -->
+          <div>
+            <span class="block text-sm font-medium mb-1">Tỉ lệ khung hình</span>
+            <div class="flex flex-wrap gap-3">
+              <label class="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="aspectRatio"
+                  value="IMAGE_ASPECT_RATIO_LANDSCAPE"
+                  class="text-primary focus:ring-primary"
+                />
+                <span>16:9 (ngang)</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="aspectRatio"
+                  value="IMAGE_ASPECT_RATIO_PORTRAIT"
+                  class="text-primary focus:ring-primary"
+                  checked
+                />
+                <span>9:16 (dọc)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Hidden full prompt field -->
+          <textarea
+            id="promptFull"
+            class="hidden"
+            readonly
+          ></textarea>
+
+          <!-- Submit -->
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary.dark text-white text-sm font-semibold px-4 py-2.5 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <span>Tạo hình ảnh AI</span>
+            </button>
+
+          </div>
+
+          <!-- Error message -->
+          <p id="errorMessage" class="mt-1 text-sm text-red-500 hidden"></p>
+        </form>
+
+        <!-- Result -->
+        <section id="resultSection" class="mt-6 hidden">
+          <h2 class="text-sm font-semibold mb-2">Kết quả</h2>
+          <div
+            id="resultMedia"
+            class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 min-h-[120px]
+                   flex items-center justify-center text-xs text-slate-500
+                   dark:border-slate-800 dark:bg-slate-900/80"
+          >
+            <!-- Media will be injected here -->
+          </div>
+          <div class="mt-3 flex gap-3">
+            <a
+              id="downloadBtn"
+              href="#"
+              class="hidden px-4 py-2 rounded-xl bg-primary hover:bg-primary.dark text-white text-sm font-semibold transition"
+              download
+            >
+              Tải ảnh về
+            </a>
+            <button
+              id="resetBtn"
+              class="px-4 py-2 rounded-xl border border-slate-200 text-sm hover:bg-slate-100 transition
+                     dark:border-slate-700 dark:hover:bg-slate-800"
+            >
+              Tạo mới
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Loading overlay -->
+    <div
+      id="loadingOverlay"
+      class="fixed inset-0 bg-black/70 backdrop-blur flex flex-col items-center justify-center z-50 hidden"
+    >
+      <div class="w-14 h-14 border-4 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mb-4"></div>
+      <p class="text-sm text-slate-100">
+        Đang tạo hình ảnh, vui lòng chờ…
+      </p>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    (function () {
+      // ===== THEME TOGGLE =====
+      const root = document.documentElement;
+      const toggleBtn = document.getElementById('themeToggle');
+      const label = toggleBtn ? toggleBtn.querySelector('.theme-label') : null;
+
+      const savedTheme = localStorage.getItem('tvt-theme');
+      if (savedTheme === 'dark') {
+        root.classList.add('dark');
+      } else if (savedTheme === 'light') {
+        root.classList.remove('dark');
+      }
+
+      function updateThemeLabel() {
+        const isDark = root.classList.contains('dark');
+        if (label) {
+          label.textContent = isDark ? 'Dark' : 'Light';
+        }
+      }
+      updateThemeLabel();
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          root.classList.toggle('dark');
+          const isDark = root.classList.contains('dark');
+          localStorage.setItem('tvt-theme', isDark ? 'dark' : 'light');
+          updateThemeLabel();
+        });
+      }
+
+      // ===== FORM + WEBHOOK LOGIC =====
+      const form = document.getElementById('generatorForm');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const resultSection = document.getElementById('resultSection');
+      const resultMedia = document.getElementById('resultMedia');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      const promptFullField = document.getElementById('promptFull');
+
+      const WEBHOOK_URL = 'https://n8n.taxinamthang.com/webhook/create-image-video-flow';
+
+      function setLoading(isLoading) {
+        const elements = form.querySelectorAll('input, textarea, select, button');
+        elements.forEach(el => {
+          el.disabled = isLoading;
+        });
+        loadingOverlay.classList.toggle('hidden', !isLoading);
+      }
+
+      function buildFullPrompt({ prompt, style, color, lighting, size, background, aspectRatio }) {
+        const parts = [];
+
+        if (prompt && prompt.trim()) {
+          parts.push(prompt.trim());
+        }
+        if (style) {
+          parts.push('Style: ' + style + '.');
+        }
+        if (color) {
+          parts.push('Main color: ' + color + '.');
+        }
+        if (lighting) {
+          parts.push('Lighting: ' + lighting + '.');
+        }
+        if (background) {
+          parts.push('Background: ' + background + '.');
+        }
+        if (size) {
+          parts.push('Size: ' + size + '.');
+        }
+
+        if (aspectRatio === 'IMAGE_ASPECT_RATIO_LANDSCAPE') {
+          parts.push('Aspect ratio: 16:9 landscape.');
+        } else if (aspectRatio === 'IMAGE_ASPECT_RATIO_PORTRAIT') {
+          parts.push('Aspect ratio: 9:16 portrait.');
+        }
+
+        return parts.join(' ');
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
+
+        const prompt = document.getElementById('prompt').value;
+        const style = document.getElementById('style').value;
+        const color = document.getElementById('mainColor').value;
+        const lighting = document.getElementById('lighting').value;
+        const background = document.getElementById('background').value;
+        const size = document.getElementById('size').value;
+        const aspectRatioInput = document.querySelector('input[name="aspectRatio"]:checked');
+        const aspectRatio = aspectRatioInput ? aspectRatioInput.value : 'IMAGE_ASPECT_RATIO_PORTRAIT';
+
+        if (!prompt || !prompt.trim()) {
+          errorMessage.textContent = 'Vui lòng nhập nội dung yêu cầu (prompt).';
+          errorMessage.classList.remove('hidden');
+          return;
+        }
+
+        const type = 'image';
+
+        const promptFull = buildFullPrompt({
+          prompt,
+          style,
+          color,
+          lighting,
+          size,
+          background,
+          aspectRatio
+        });
+
+        if (promptFullField) {
+          promptFullField.value = promptFull;
+        }
+
+        const payload = {
+          type: type,
+          prompt_full: promptFull,
+          raw: {
+            prompt: prompt,
+            style: style,
+            main_color: color,
+            lighting: lighting,
+            background: background,
+            size: size,
+            aspect_ratio: aspectRatio
+          }
+        };
+
+        setLoading(true);
+        resultSection.classList.add('hidden');
+        resultMedia.innerHTML = '';
+        downloadBtn.classList.add('hidden');
+
+        try {
+          const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+          }
+
+          const data = await response.json();
+
+          if (!data || data.status !== 'success' || !data.url) {
+            throw new Error('Phản hồi không hợp lệ từ n8n');
+          }
+
+          const url = data.url;
+          resultMedia.innerHTML = '';
+
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = 'Kết quả tạo hình ảnh';
+          img.loading = 'lazy';
+          img.className = 'w-full max-h-[480px] object-contain bg-black';
+          resultMedia.appendChild(img);
+
+          downloadBtn.href = url;
+          const extFromUrl = (url.split('.').pop() || '').split(/\#|\?/)[0];
+          const fallbackExt = 'png';
+          const ext = extFromUrl || fallbackExt;
+          downloadBtn.download = 'flowlabs-image.' + ext;
+          downloadBtn.classList.remove('hidden');
+
+          resultSection.classList.remove('hidden');
+        } catch (err) {
+          console.error(err);
+          errorMessage.textContent = 'Có lỗi khi gọi n8n (có thể do CORS, URL webhook, hoặc lỗi trong flow). Vui lòng kiểm tra lại log n8n.';
+          errorMessage.classList.remove('hidden');
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      resetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        form.reset();
+        resultSection.classList.add('hidden');
+        resultMedia.innerHTML = '';
+        downloadBtn.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
+        if (promptFullField) {
+          promptFullField.value = '';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
