@@ -36,9 +36,9 @@
             <span class="text-xs font-bold text-white tracking-tight">TVT</span>
           </div>
           <div>
-            <p class="text-sm font-semibold leading-tight">TẠO HÌNH ẢNH AI CHUYÊN NGHIỆP</p>
+            <p class="text-sm font-semibold leading-tight">TVT Team FlowLabs</p>
             <p class="text-[11px] text-slate-500 dark:text-slate-400">
-              TVT Team
+              Image Prompt Creator (Banana + n8n)
             </p>
           </div>
         </div>
@@ -85,9 +85,9 @@
                      resize-none min-h-[90px]"
               placeholder="Mô tả cảnh / nhân vật / bố cục bạn muốn tạo (càng chi tiết càng ra hình đẹp)"
               required
-            >taoanh:</textarea>
+            ></textarea>
             <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-              Gợi ý: hãy mô tả bằng các từ khóa rõ ràng, viết liền, không được xuống hàng.
+              Hệ thống sẽ luôn tự thêm prefix <code>taoanh:</code> khi gửi sang n8n (kể cả khi bạn không gõ).
             </p>
           </div>
 
@@ -136,7 +136,7 @@
           <!-- Lighting -->
           <div>
             <label for="lighting" class="block text-sm font-medium mb-1">
-              Ánh sáng
+              Ánh sáng (gợi ý)
             </label>
             <select
               id="lighting"
@@ -219,7 +219,7 @@
             </div>
           </div>
 
-          <!-- Hidden full prompt field -->
+          <!-- Hidden full prompt field (debug) -->
           <textarea
             id="promptFull"
             class="hidden"
@@ -232,9 +232,11 @@
               type="submit"
               class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary.dark text-white text-sm font-semibold px-4 py-2.5 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span>Tạo hình ảnh AI</span>
+              <span>Tạo hình ảnh với Banana</span>
             </button>
-
+            <p class="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+              Frontend sẽ gọi tới webhook n8n.
+            </p>
           </div>
 
           <!-- Error message -->
@@ -327,6 +329,7 @@
       const errorMessage = document.getElementById('errorMessage');
       const promptFullField = document.getElementById('promptFull');
 
+      // 🔗 Webhook của bạn – chỉnh lại path nếu cần
       const WEBHOOK_URL = 'https://n8n.taxinamthang.com/webhook/create-image-video-flow';
 
       function setLoading(isLoading) {
@@ -369,88 +372,126 @@
       }
 
       form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+        e.preventDefault();
 
-  errorMessage.classList.add('hidden');
-  errorMessage.textContent = '';
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
 
-  const promptInputEl = document.getElementById('prompt');
-  const style = document.getElementById('style').value;
-  const color = document.getElementById('mainColor').value;
-  const lighting = document.getElementById('lighting').value;
-  const background = document.getElementById('background').value;
-  const size = document.getElementById('size').value;
-  const aspectRatioInput = document.querySelector('input[name="aspectRatio"]:checked');
-  const aspectRatio = aspectRatioInput ? aspectRatioInput.value : 'IMAGE_ASPECT_RATIO_PORTRAIT';
+        const promptInputEl = document.getElementById('prompt');
+        const style = document.getElementById('style').value;
+        const color = document.getElementById('mainColor').value;
+        const lighting = document.getElementById('lighting').value;
+        const background = document.getElementById('background').value;
+        const size = document.getElementById('size').value;
+        const aspectRatioInput = document.querySelector('input[name="aspectRatio"]:checked');
+        const aspectRatio = aspectRatioInput ? aspectRatioInput.value : 'IMAGE_ASPECT_RATIO_PORTRAIT';
 
-  let userPromptRaw = promptInputEl.value || '';
-  let basePrompt = userPromptRaw.trim();
+        let userPromptRaw = promptInputEl.value || '';
+        let basePrompt = userPromptRaw.trim();
 
-  if (!basePrompt) {
-    errorMessage.textContent = 'Vui lòng nhập nội dung yêu cầu (prompt).';
-    errorMessage.classList.remove('hidden');
-    return;
-  }
+        if (!basePrompt) {
+          errorMessage.textContent = 'Vui lòng nhập nội dung yêu cầu (prompt).';
+          errorMessage.classList.remove('hidden');
+          return;
+        }
 
-  // 👇 Auto thêm prefix "taoanh:" nếu user không gõ
-  let promptForModel = basePrompt;
-  const lower = basePrompt.toLowerCase();
-  if (!lower.startsWith('taoanh:')) {
-    promptForModel = 'taoanh: ' + basePrompt;
-  }
+        // ✅ Auto thêm prefix "taoanh:" nếu user không gõ
+        let promptForModel = basePrompt;
+        const lower = basePrompt.toLowerCase();
+        if (!lower.startsWith('taoanh:')) {
+          promptForModel = 'taoanh: ' + basePrompt;
+        }
 
-  const type = 'image';
+        const type = 'image';
 
-  const promptFull = buildFullPrompt({
-    prompt: promptForModel,   // dùng prompt đã có taoanh:
-    style,
-    color,
-    lighting,
-    size,
-    background,
-    aspectRatio
-  });
+        const promptFull = buildFullPrompt({
+          prompt: promptForModel,
+          style,
+          color,
+          lighting,
+          size,
+          background,
+          aspectRatio
+        });
 
-  if (promptFullField) {
-    promptFullField.value = promptFull;
-  }
+        if (promptFullField) {
+          promptFullField.value = promptFull;
+        }
 
-  const payload = {
-    type: type,
-    prompt_full: promptFull,
-    raw: {
-      prompt: promptForModel,        // 👈 ở raw cũng dùng bản có taoanh:
-      style: style,
-      main_color: color,
-      lighting: lighting,
-      background: background,
-      size: size,
-      aspect_ratio: aspectRatio
-    }
-  };
+        const payload = {
+          type: type,
+          prompt_full: promptFull,
+          raw: {
+            prompt: promptForModel,
+            style: style,
+            main_color: color,
+            lighting: lighting,
+            background: background,
+            size: size,
+            aspect_ratio: aspectRatio
+          }
+        };
 
-  setLoading(true);
-  resultSection.classList.add('hidden');
-  resultMedia.innerHTML = '';
-  downloadBtn.classList.add('hidden');
+        setLoading(true);
+        resultSection.classList.add('hidden');
+        resultMedia.innerHTML = '';
+        downloadBtn.classList.add('hidden');
 
-  try {
-    const response = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+        try {
+          const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            mode: 'cors', // 👈 CORS mode (mặc định đã là 'cors', nhưng để rõ ràng)
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
 
-    ...
-  } catch (err) {
-    ...
-  } finally {
-    setLoading(false);
-  }
-});
+          // Nếu server chặn CORS, error thường xảy ra TRƯỚC khi tới đây.
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+          }
 
+          const data = await response.json();
+
+          if (!data || data.status !== 'success' || !data.url) {
+            throw new Error('Phản hồi không hợp lệ từ n8n');
+          }
+
+          const url = data.url;
+          resultMedia.innerHTML = '';
+
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = 'Kết quả tạo hình ảnh';
+          img.loading = 'lazy';
+          img.className = 'w-full max-h-[480px] object-contain bg-black';
+          resultMedia.appendChild(img);
+
+          downloadBtn.href = url;
+          const extFromUrl = (url.split('.').pop() || '').split(/\#|\?/)[0];
+          const fallbackExt = 'png';
+          const ext = extFromUrl || fallbackExt;
+          downloadBtn.download = 'flowlabs-image.' + ext;
+          downloadBtn.classList.remove('hidden');
+
+          resultSection.classList.remove('hidden');
+        } catch (err) {
+          console.error(err);
+          // Lỗi CORS trong browser thường hiện "TypeError: Failed to fetch"
+          const msg = String(err);
+          if (msg.includes('TypeError') || msg.toLowerCase().includes('failed to fetch')) {
+            errorMessage.textContent =
+              'Có thể đang bị chặn CORS từ server n8n. Hãy kiểm tra header Access-Control-Allow-Origin trên n8n / Nginx.';
+          } else {
+            errorMessage.textContent =
+              'Có lỗi khi gọi n8n: ' + msg + '. Vui lòng kiểm tra lại log n8n.';
+          }
+          errorMessage.classList.remove('hidden');
+        } finally {
+          setLoading(false);
+        }
+      });
 
       resetBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -468,5 +509,3 @@
   </script>
 </body>
 </html>
-
-
