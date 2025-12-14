@@ -369,106 +369,88 @@
       }
 
       form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  e.preventDefault();
 
-        errorMessage.classList.add('hidden');
-        errorMessage.textContent = '';
+  errorMessage.classList.add('hidden');
+  errorMessage.textContent = '';
 
-        const prompt = document.getElementById('prompt').value;
-        const style = document.getElementById('style').value;
-        const color = document.getElementById('mainColor').value;
-        const lighting = document.getElementById('lighting').value;
-        const background = document.getElementById('background').value;
-        const size = document.getElementById('size').value;
-        const aspectRatioInput = document.querySelector('input[name="aspectRatio"]:checked');
-        const aspectRatio = aspectRatioInput ? aspectRatioInput.value : 'IMAGE_ASPECT_RATIO_PORTRAIT';
+  const promptInputEl = document.getElementById('prompt');
+  const style = document.getElementById('style').value;
+  const color = document.getElementById('mainColor').value;
+  const lighting = document.getElementById('lighting').value;
+  const background = document.getElementById('background').value;
+  const size = document.getElementById('size').value;
+  const aspectRatioInput = document.querySelector('input[name="aspectRatio"]:checked');
+  const aspectRatio = aspectRatioInput ? aspectRatioInput.value : 'IMAGE_ASPECT_RATIO_PORTRAIT';
 
-        if (!prompt || !prompt.trim()) {
-          errorMessage.textContent = 'Vui lòng nhập nội dung yêu cầu (prompt).';
-          errorMessage.classList.remove('hidden');
-          return;
-        }
+  let userPromptRaw = promptInputEl.value || '';
+  let basePrompt = userPromptRaw.trim();
 
-        const type = 'image';
+  if (!basePrompt) {
+    errorMessage.textContent = 'Vui lòng nhập nội dung yêu cầu (prompt).';
+    errorMessage.classList.remove('hidden');
+    return;
+  }
 
-        const promptFull = buildFullPrompt({
-          prompt,
-          style,
-          color,
-          lighting,
-          size,
-          background,
-          aspectRatio
-        });
+  // 👇 Auto thêm prefix "taoanh:" nếu user không gõ
+  let promptForModel = basePrompt;
+  const lower = basePrompt.toLowerCase();
+  if (!lower.startsWith('taoanh:')) {
+    promptForModel = 'taoanh: ' + basePrompt;
+  }
 
-        if (promptFullField) {
-          promptFullField.value = promptFull;
-        }
+  const type = 'image';
 
-        const payload = {
-          type: type,
-          prompt_full: promptFull,
-          raw: {
-            prompt: prompt,
-            style: style,
-            main_color: color,
-            lighting: lighting,
-            background: background,
-            size: size,
-            aspect_ratio: aspectRatio
-          }
-        };
+  const promptFull = buildFullPrompt({
+    prompt: promptForModel,   // dùng prompt đã có taoanh:
+    style,
+    color,
+    lighting,
+    size,
+    background,
+    aspectRatio
+  });
 
-        setLoading(true);
-        resultSection.classList.add('hidden');
-        resultMedia.innerHTML = '';
-        downloadBtn.classList.add('hidden');
+  if (promptFullField) {
+    promptFullField.value = promptFull;
+  }
 
-        try {
-          const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
+  const payload = {
+    type: type,
+    prompt_full: promptFull,
+    raw: {
+      prompt: promptForModel,        // 👈 ở raw cũng dùng bản có taoanh:
+      style: style,
+      main_color: color,
+      lighting: lighting,
+      background: background,
+      size: size,
+      aspect_ratio: aspectRatio
+    }
+  };
 
-          if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
-          }
+  setLoading(true);
+  resultSection.classList.add('hidden');
+  resultMedia.innerHTML = '';
+  downloadBtn.classList.add('hidden');
 
-          const data = await response.json();
+  try {
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
 
-          if (!data || data.status !== 'success' || !data.url) {
-            throw new Error('Phản hồi không hợp lệ từ n8n');
-          }
+    ...
+  } catch (err) {
+    ...
+  } finally {
+    setLoading(false);
+  }
+});
 
-          const url = data.url;
-          resultMedia.innerHTML = '';
-
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = 'Kết quả tạo hình ảnh';
-          img.loading = 'lazy';
-          img.className = 'w-full max-h-[480px] object-contain bg-black';
-          resultMedia.appendChild(img);
-
-          downloadBtn.href = url;
-          const extFromUrl = (url.split('.').pop() || '').split(/\#|\?/)[0];
-          const fallbackExt = 'png';
-          const ext = extFromUrl || fallbackExt;
-          downloadBtn.download = 'flowlabs-image.' + ext;
-          downloadBtn.classList.remove('hidden');
-
-          resultSection.classList.remove('hidden');
-        } catch (err) {
-          console.error(err);
-          errorMessage.textContent = 'Có lỗi khi gọi n8n (có thể do CORS, URL webhook, hoặc lỗi trong flow). Vui lòng kiểm tra lại log n8n.';
-          errorMessage.classList.remove('hidden');
-        } finally {
-          setLoading(false);
-        }
-      });
 
       resetBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -486,4 +468,5 @@
   </script>
 </body>
 </html>
+
 
